@@ -37,14 +37,17 @@
     // 注册菜单
     GM_registerMenuCommand("拒绝二维码登录开关设置", setBtnStart);
 
+    //setBtnStart();
+
     function setBtnStart() {
-        var settingdiv = $('<div class="bb">hello</div>');
+        var settingdiv = $('<div class="test">Hello World</div>');
         addGlobalStyle();
         $('body').append(settingdiv)
     }
 
     function addGlobalStyle() {
-        $("<style></style>").text(".bb{color:red;}").appendTo($("head"));
+        var globalStyle = '.test{color:red}';
+        $("<style></style>").text(globalStyle).appendTo($("head"));
     }
 
     var settingData = [
@@ -69,10 +72,10 @@
 
     //更新设置
     var storageData = getStorageData();
-    console.log('浏览器本地数据', storageData)
+    console.log('浏览器本地数据', storageData);
     if (storageData) {
         //同步最新支持列表到本地存储的设置数据
-        var needUpate = false
+        var needUpate = false;
         var missingData = [];
         $.each(settingData, function (i, item) {
             var matchCount = 0;
@@ -80,8 +83,8 @@
                 if (item.name == data.name) {
                     matchCount++;
                     if (item.url.toString() != data.url.toString()) {
-                        console.log("变更数据", data.url, "为", item.url)
-                        data.url = item.url
+                        console.log("变更数据", data.url, "为", item.url);
+                        data.url = item.url;
                         needUpate = true;
                     }
                 }
@@ -89,17 +92,17 @@
             if (matchCount == 0) missingData.push(item)
         });
         if (missingData.length > 0) {
-            console.log("更新数据", missingData)
+            console.log("更新数据", missingData);
             $.merge(storageData, missingData);
             needUpate = true;
         }
     } else {
         //初始化浏览器本地存储的设置数据
         storageData = settingData
-        console.log("初始化数据", storageData)
+        console.log("初始化数据", storageData);
         needUpate = true;
     }
-    if (needUpate) setStorageData(storageData)
+    if (needUpate) setStorageData(storageData);
 
 
     //处理业务
@@ -115,13 +118,13 @@
 
     function check(url, enabled) {
         if (matchURL(url) && enabled) {
-            process(url)
+            process(url);
             return false;
         }
     }
 
     function process(url) {
-        console.log("网址匹配,可切换二维码登录：", url)
+        console.log("网址匹配,可切换二维码登录：", url);
         switch (url) {
             case 'kyfw.12306.cn':  //12306
                 var auto = setInterval(function () {
