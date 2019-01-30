@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Settings</title>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <style type="text/css">
+        /* 开关按钮 */
+        #itemlist {
+            display: flex;
+            display: -webkit-flex;
+            align-content: center;
+            align-items: center;
+            justify-content: center;
+            flex-flow: row wrap;
+        }
+
+        section {
+            float: left;
+            width: 200px;
+            padding: 6px 20px;
+        }
+
+        .switch span {
+            height: 30px;
+            line-height: 30px;
+            font-size: 20px;
+            vertical-align: top;
+        }
+
+        .switch .checkbox {
+            float: right;
+        }
+
+        .checkbox {
+            position: relative;
+            display: inline-block;
+        }
+
+        .checkbox:after,
+        .checkbox:before {
+            -webkit-font-feature-settings: normal;
+            -moz-font-feature-settings: normal;
+            font-feature-settings: normal;
+            -webkit-font-kerning: auto;
+            font-kerning: auto;
+            -moz-font-language-override: normal;
+            font-language-override: normal;
+            font-stretch: normal;
+            font-style: normal;
+            font-synthesis: weight style;
+            font-variant: normal;
+            font-weight: normal;
+            text-rendering: auto;
+        }
+
+        .checkbox label {
+            width: 80px;
+            height: 30px;
+            background: #ccc;
+            position: relative;
+            display: inline-block;
+            border-radius: 46px;
+            -webkit-transition: 0.4s;
+            transition: 0.4s;
+            cursor: pointer;
+        }
+
+        .checkbox label:after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            left: 0;
+            top: -5px;
+            z-index: 2;
+            background: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            -webkit-transition: 0.4s;
+            transition: 0.4s;
+            cursor: pointer;
+        }
+
+        .checkbox input {
+            display: none;
+        }
+
+        .checkbox.on label:after {
+            left: 40px;
+        }
+
+        .checkbox.on label {
+            background: #4BD865;
+        }
+
+        .switch .checkbox label {
+            width: 70px;
+        }
+
+        .switch .checkbox label:after {
+            top: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        /* 弹出层 */
+        #settingLayerMask {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, .5);
+            z-index: 200000000;
+            overflow: auto;
+            font-family: arial, sans-serif;
+            min-height: 100%;
+            font-size: 16px;
+            transition: 0.5s;
+            opacity: 1;
+            user-select: none;
+            -moz-user-select: none;
+            padding-bottom: 80px;
+            box-sizing: border-box;
+        }
+
+        #settingLayer {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            margin: 0px 25px 50px 5px;
+            background-color: #fff;
+            border-radius: 4px;
+            position: absolute;
+            width: 60%;
+            /* height: 50%; */
+            transition: 0.5s;
+        }
+
+
+        #btnEle {
+            position: absolute;
+            width: 100%;
+            bottom: 4px;
+            right: 0;
+            background: #fff;
+            border-radius: 4px;
+        }
+
+        #btnEle span {
+            display: inline-block;
+            background: #EFF4F8;
+            border: 1px solid #3abdc1;
+            margin: 12px auto 10px;
+            color: #3abdc1;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #btnEle a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        #btnEle a:hover {
+            text-decoration: underline;
+            color: #ef8957;
+        }
+
+        #btnEle span.feedback:hover {
+            border-color: #ef8957;
+        }
+
+        #btnEle span:not(.feedback):hover {
+            background: #3ACBDD;
+            color: #fff;
+        }
+
+        #btnEle .feedback {
+            border-color: #aaa;
+        }
+
+        #btnEle>div {
+            width: 100%;
+            margin-bottom: -100%;
+            display: flex;
+            justify-content: space-around;
+            background: #EFF4F8;
+            border-radius: 4px;
+        }
+
+        /*close button*/
+        #noqrlogin-close {
+            background: white;
+            color: #3ABDC1;
+            line-height: 20px;
+            text-align: center;
+            height: 20px;
+            width: 20px;
+            font-size: 20px;
+            padding: 10px;
+            border: 3px solid #3ABDC1;
+            border-radius: 50%;
+            transition: .5s;
+            top: -20px;
+            right: -20px;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        #noqrlogin-close::before {
+            content: '\2716';
+        }
+
+        #noqrlogin-close:hover {
+            background: indianred;
+            border-color: indianred;
+            color: #fff;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div id="wrapper_wrapper" style="display: block;">
+        <div id="container" class="container_l">
+            <a class="start">开启</a>
+        </div>
+    </div>
+    <div id="settingLayerMask">
+        <div id="settingLayer">
+            <div id="itemlist"></div>
+            <div id="btnEle">
+                <div class="btnEleLayer">
+                    <span class="feedback">
+                        <a target="_blank" href="https://greasyfork.org/zh-CN/scripts/37988-%E6%8B%92%E7%BB%9D%E4%BA%8C%E7%BB%B4%E7%A0%81%E7%99%BB%E5%BD%95">反馈
+                            greasyfork</a>
+                    </span>
+                    <span class="feedback">
+                        <a target="_blank" href="https://github.com/mmxxooyy/NoQRCodeLogin">反馈 GitHub</a>
+                    </span>
+                    <span id="noqrlogin-save" title="save &amp; close">保存并关闭</span></div>
+            </div>
+            <span id="noqrlogin-close" title="close 关闭"></span>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            var storageData = [{
+                    'name': '12306',
+                    'url': 'kyfw.12306.cn',
+                    'enabled': true
+                },
+                {
+                    'name': '淘宝',
+                    'url': 'login.taobao.com',
+                    'enabled': true
+                },
+                {
+                    'name': '京东',
+                    'url': 'passport.jd.com',
+                    'enabled': true
+                },
+                {
+                    'name': '百度',
+                    'url': 'baidu.com',
+                    'enabled': true
+                },
+                {
+                    'name': '豆瓣',
+                    'url': 'douban.com',
+                    'enabled': true
+                },
+                {
+                    'name': '苏宁易购',
+                    'url': 'passport.suning.com',
+                    'enabled': true
+                },
+                {
+                    'name': '知乎',
+                    'url': 'zhihu.com',
+                    'enabled': true
+                },
+                {
+                    'name': '支付宝',
+                    'url': 'alipay.com',
+                    'enabled': true
+                },
+                {
+                    'name': '腾讯QQ',
+                    'url': ['xui.ptlogin2.qq.com', 'ssl.xui.ptlogin2.qq.com', 'ui.ptlogin2.qq.com'],
+                    'enabled': true
+                },
+                {
+                    'name': '微云',
+                    'url': 'weiyun.com',
+                    'enabled': true
+                },
+                {
+                    'name': '腾讯云',
+                    'url': ['cloud.tencent.com', 'qcloud.com'],
+                    'enabled': true
+                },
+                {
+                    'name': '腾讯企业邮箱',
+                    'url': 'exmail.qq.com',
+                    'enabled': true
+                },
+                {
+                    'name': '虾米音乐',
+                    'url': 'xiami.com',
+                    'enabled': true
+                },
+                {
+                    'name': '虎牙直播',
+                    'url': 'huya.com',
+                    'enabled': true
+                },
+                {
+                    'name': '58同城',
+                    'url': 'passport.58.com',
+                    'enabled': true
+                },
+                {
+                    'name': '百姓网',
+                    'url': 'baixing.com',
+                    'enabled': true
+                },
+                {
+                    'name': '升蓝物流',
+                    'url': 'sl56.com',
+                    'enabled': true
+                }
+            ];
+            $.each(storageData, function (i, item) {
+                var itemDiv = $('<section class="switch"></section>');
+                var checkDiv = $('<div class="checkbox"></div>');
+                if (item.enabled) checkDiv.addClass('on')
+                itemDiv.append($('<span></span>').text(
+                    item.name)).append(checkDiv
+                    .append($('<input type="checkbox" />').attr('name', item.name)).append($(
+                        '<label></label>')));
+                $('#itemlist').append(itemDiv);
+            })
+
+            $('#noqrlogin-save').on('click', function () {
+                $('section.switch input').each(function (i, e) {
+                    $.each(storageData, function (r, d) {
+                        if (d.name == e.name) d.enabled = $(e.closest('.checkbox')).hasClass(
+                            'on')
+                    })
+                })
+                console.log(storageData)
+                hideLayer();
+            })
+
+
+            $('.start').on('click', function () {
+                setTimeout(function () {
+                    $('#settingLayerMask').css('display', 'flex')
+                }, 30);
+            })
+            $('.start').trigger('click')
+
+
+            $('#settingLayer').on('click', function (e) {
+                e.stopPropagation();
+            })
+
+            $('#settingLayerMask').on('click', function () {
+                hideLayer();
+            })
+
+            $('#noqrlogin-close').on('click', function () {
+                hideLayer();
+            })
+
+            //切换开关
+            $('.checkbox').on('click', function () {
+                var self = $(this);
+                if (self.hasClass('on')) {
+                    self.removeClass('on');
+                } else {
+                    self.addClass('on');
+                }
+            })
+
+            var hideLayer = function () {
+                setTimeout(function () {
+                    $('#settingLayerMask').css('display', 'none')
+                }, 100);
+            }
+
+        })
+    </script>
+</body>
+
+</html>
