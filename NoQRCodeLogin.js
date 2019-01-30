@@ -35,44 +35,35 @@
     'use strict';
 
     // 注册菜单
-    GM_registerMenuCommand("拒绝二维码登录开关设置", setBtnStart);
-
-    //setBtnStart();
-
-    function setBtnStart() {
-        var settingdiv = $('<div class="test">Hello World</div>');
-        addGlobalStyle();
-        $('body').append(settingdiv)
-    }
-
-    function addGlobalStyle() {
-        var globalStyle = '.test{color:red}';
-        $("<style></style>").text(globalStyle).appendTo($("head"));
-    }
+    GM_registerMenuCommand("拒绝二维码登录开关设置", startSettings);
 
     var settingData = [
-        { 'name': '12306', 'url': 'kyfw.12306.cn', 'enabled': true },
-        { 'name': '淘宝', 'url': 'login.taobao.com', 'enabled': true },
-        { 'name': '京东', 'url': 'passport.jd.com', 'enabled': true },
-        { 'name': '百度', 'url': 'baidu.com', 'enabled': true },
-        { 'name': '豆瓣', 'url': 'douban.com', 'enabled': true },
-        { 'name': '苏宁易购', 'url': 'passport.suning.com', 'enabled': true },
-        { 'name': '知乎', 'url': 'zhihu.com', 'enabled': true },
-        { 'name': '支付宝', 'url': 'alipay.com', 'enabled': true },
-        { 'name': '腾讯QQ', 'url': ['xui.ptlogin2.qq.com', 'ssl.xui.ptlogin2.qq.com', 'ui.ptlogin2.qq.com'], 'enabled': true },
-        { 'name': '微云', 'url': 'weiyun.com', 'enabled': true },
-        { 'name': '腾讯云', 'url': ['cloud.tencent.com', 'qcloud.com'], 'enabled': true },
-        { 'name': '腾讯企业邮箱', 'url': 'exmail.qq.com', 'enabled': true },
-        { 'name': '虾米音乐', 'url': 'xiami.com', 'enabled': true },
-        { 'name': '虎牙直播', 'url': 'huya.com', 'enabled': true },
-        { 'name': '58同城', 'url': 'passport.58.com', 'enabled': true },
-        { 'name': '百姓网', 'url': 'baixing.com', 'enabled': true },
-        { 'name': '升蓝物流', 'url': 'sl56.com', 'enabled': true }
+        {'name': '12306', 'url': 'kyfw.12306.cn', 'enabled': true},
+        {'name': '淘宝', 'url': 'login.taobao.com', 'enabled': true},
+        {'name': '京东', 'url': 'passport.jd.com', 'enabled': true},
+        {'name': '百度', 'url': 'baidu.com', 'enabled': true},
+        {'name': '豆瓣', 'url': 'douban.com', 'enabled': true},
+        {'name': '苏宁易购', 'url': 'passport.suning.com', 'enabled': true},
+        {'name': '知乎', 'url': 'zhihu.com', 'enabled': true},
+        {'name': '支付宝', 'url': 'alipay.com', 'enabled': true},
+        {
+            'name': '腾讯QQ',
+            'url': ['xui.ptlogin2.qq.com', 'ssl.xui.ptlogin2.qq.com', 'ui.ptlogin2.qq.com'],
+            'enabled': true
+        },
+        {'name': '微云', 'url': 'weiyun.com', 'enabled': true},
+        {'name': '腾讯云', 'url': ['cloud.tencent.com', 'qcloud.com'], 'enabled': true},
+        {'name': '腾讯企业邮箱', 'url': 'exmail.qq.com', 'enabled': true},
+        {'name': '虾米音乐', 'url': 'xiami.com', 'enabled': true},
+        {'name': '虎牙直播', 'url': 'huya.com', 'enabled': true},
+        {'name': '58同城', 'url': 'passport.58.com', 'enabled': true},
+        {'name': '百姓网', 'url': 'baixing.com', 'enabled': true},
+        {'name': '升蓝物流', 'url': 'sl56.com', 'enabled': true}
     ];
 
     //更新设置
     var storageData = getStorageData();
-    console.log('浏览器本地数据', storageData);
+    //console.log('浏览器本地数据', storageData);
     if (storageData) {
         //同步最新支持列表到本地存储的设置数据
         var needUpate = false;
@@ -98,11 +89,331 @@
         }
     } else {
         //初始化浏览器本地存储的设置数据
-        storageData = settingData
+        storageData = settingData;
         console.log("初始化数据", storageData);
         needUpate = true;
     }
     if (needUpate) setStorageData(storageData);
+
+    function Settings() {
+        this.mask = $('<div></div>');
+        this.ele = $('<div></div>');
+        this.init();
+    }
+
+    Settings.prototype = {
+        init: function () {
+            var self = this;
+            self.mask.attr('id', 'settingLayerMask');
+            self.ele.attr('id', 'settingLayer');
+            self.addContent();
+            self.addGlobalStyle();
+            self.mask.append(self.ele);
+            $('body').append(self.mask);
+            self.mask.on('click', function () {
+                self.hide();
+            });
+            self.ele.on('click', function (e) {
+                self.bindClick(e);
+                e.stopPropagation();
+            });
+            $(document).keyup(function (e) {
+                if (e.key === "Escape") { // escape key maps to keycode `27`
+                    self.hide();
+                }
+            });
+        },
+        addContent: function () {
+            //各网站开关
+            var itemList = $('<div id="itemlist"></div>');
+            $.each(storageData, function (i, item) {
+                var itemDiv = $('<section class="switch"></section>');
+                var checkDiv = $('<div class="checkbox"></div>');
+                if (item.enabled) checkDiv.addClass('on')
+                itemDiv.append($('<span></span>').text(item.name)).append(checkDiv.append($('<input type="checkbox" />').attr('name', item.name)).append($('<label class="switchLabel"></label>')));
+                itemList.append(itemDiv);
+            });
+            //按钮（反馈、保存等）
+            var btnEle = $('<div id="btnEle"></div>');
+            //Greasyfork反馈按钮
+            var feedbackGreasyforkEle = $('<span class="feedback"></span>').append($('<a target="_blank" href="https://greasyfork.org/zh-CN/scripts/37988-%E6%8B%92%E7%BB%9D%E4%BA%8C%E7%BB%B4%E7%A0%81%E7%99%BB%E5%BD%95">反馈greasyfork</a>'));
+            //GitHub反馈按钮
+            var feedbackGitHubEle = $('<span class="feedback"></span>').append($('<a target="_blank" href="https://github.com/mmxxooyy/NoQRCodeLogin">反馈 GitHub</a>'));
+            //保存按钮
+            var saveEle = $('<span id="noqrlogin-save" title="save &amp; close">保存并关闭</span>');
+            //关闭按钮
+            var closeEle = $('<span id="noqrlogin-close" title="close 关闭"></span>');
+            this.ele.append(itemList).append(btnEle.append($('<div class="btnEleLayer"></div>').append(feedbackGreasyforkEle).append(feedbackGitHubEle).append(saveEle))).append(closeEle);
+        },
+        show: function () {
+            var self = this;
+            setTimeout(function () {
+                self.mask.css('display', 'flex');
+            }, 30);
+        },
+        hide: function () {
+            var self = this;
+            setTimeout(function () {
+                self.mask.css('display', 'none');
+            }, 100);
+        },
+        addGlobalStyle: function () {
+            var globalStyle = ' /* 开关按钮 */\n' +
+                '        #itemlist {\n' +
+                '            display: flex;\n' +
+                '            display: -webkit-flex;\n' +
+                '            align-content: center;\n' +
+                '            align-items: center;\n' +
+                '            justify-content: center;\n' +
+                '            flex-flow: row wrap;\n' +
+                '        }\n' +
+                '\n' +
+                '        section {\n' +
+                '            float: left;\n' +
+                '            width: 200px;\n' +
+                '            padding: 6px 20px;\n' +
+                '        }\n' +
+                '\n' +
+                '        .switch span {\n' +
+                '            height: 30px;\n' +
+                '            line-height: 30px;\n' +
+                '            font-size: 20px;\n' +
+                '            vertical-align: top;\n' +
+                '        }\n' +
+                '\n' +
+                '        .switch .checkbox {\n' +
+                '            float: right;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox {\n' +
+                '            position: relative;\n' +
+                '            display: inline-block;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox:after,\n' +
+                '        .checkbox:before {\n' +
+                '            -webkit-font-feature-settings: normal;\n' +
+                '            -moz-font-feature-settings: normal;\n' +
+                '            font-feature-settings: normal;\n' +
+                '            -webkit-font-kerning: auto;\n' +
+                '            font-kerning: auto;\n' +
+                '            -moz-font-language-override: normal;\n' +
+                '            font-language-override: normal;\n' +
+                '            font-stretch: normal;\n' +
+                '            font-style: normal;\n' +
+                '            font-synthesis: weight style;\n' +
+                '            font-variant: normal;\n' +
+                '            font-weight: normal;\n' +
+                '            text-rendering: auto;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox label {\n' +
+                '            width: 80px;\n' +
+                '            height: 30px;\n' +
+                '            background: #ccc;\n' +
+                '            position: relative;\n' +
+                '            display: inline-block;\n' +
+                '            border-radius: 46px;\n' +
+                '            -webkit-transition: 0.4s;\n' +
+                '            transition: 0.4s;\n' +
+                '            cursor: pointer;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox label:after {\n' +
+                '            content: \'\';\n' +
+                '            position: absolute;\n' +
+                '            width: 50px;\n' +
+                '            height: 50px;\n' +
+                '            border-radius: 100%;\n' +
+                '            left: 0;\n' +
+                '            top: -5px;\n' +
+                '            z-index: 2;\n' +
+                '            background: #fff;\n' +
+                '            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);\n' +
+                '            -webkit-transition: 0.4s;\n' +
+                '            transition: 0.4s;\n' +
+                '            cursor: pointer;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox input {\n' +
+                '            display: none;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox.on label:after {\n' +
+                '            left: 40px;\n' +
+                '        }\n' +
+                '\n' +
+                '        .checkbox.on label {\n' +
+                '            background: #4BD865;\n' +
+                '        }\n' +
+                '\n' +
+                '        .switch .checkbox label {\n' +
+                '            width: 70px;\n' +
+                '        }\n' +
+                '\n' +
+                '        .switch .checkbox label:after {\n' +
+                '            top: 0;\n' +
+                '            width: 30px;\n' +
+                '            height: 30px;\n' +
+                '        }\n' +
+                '\n' +
+                '        /* 弹出层 */\n' +
+                '        #settingLayerMask {\n' +
+                '            display: none;\n' +
+                '            justify-content: center;\n' +
+                '            align-items: center;\n' +
+                '            position: fixed;\n' +
+                '            top: 0;\n' +
+                '            right: 0;\n' +
+                '            bottom: 0;\n' +
+                '            left: 0;\n' +
+                '            background-color: rgba(0, 0, 0, .5);\n' +
+                '            z-index: 200000000;\n' +
+                '            overflow: auto;\n' +
+                '            font-family: arial, sans-serif;\n' +
+                '            min-height: 100%;\n' +
+                '            font-size: 16px;\n' +
+                '            transition: 0.5s;\n' +
+                '            opacity: 1;\n' +
+                '            user-select: none;\n' +
+                '            -moz-user-select: none;\n' +
+                '            padding-bottom: 80px;\n' +
+                '            box-sizing: border-box;\n' +
+                '        }\n' +
+                '\n' +
+                '        #settingLayer {\n' +
+                '            display: flex;\n' +
+                '            flex-wrap: wrap;\n' +
+                '            padding: 20px;\n' +
+                '            margin: 0px 25px 50px 5px;\n' +
+                '            background-color: #fff;\n' +
+                '            border-radius: 4px;\n' +
+                '            position: absolute;\n' +
+                '            width: 60%;\n' +
+                '            transition: 0.5s;\n' +
+                '        }\n' +
+                '\n' +
+                '\n' +
+                '        #btnEle {\n' +
+                '            position: absolute;\n' +
+                '            width: 100%;\n' +
+                '            bottom: 4px;\n' +
+                '            right: 0;\n' +
+                '            background: #fff;\n' +
+                '            border-radius: 4px;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle span {\n' +
+                '            display: inline-block;\n' +
+                '            background: #EFF4F8;\n' +
+                '            border: 1px solid #3abdc1;\n' +
+                '            margin: 12px auto 10px;\n' +
+                '            color: #3abdc1;\n' +
+                '            padding: 5px 10px;\n' +
+                '            border-radius: 4px;\n' +
+                '            cursor: pointer;\n' +
+                '            outline: none;\n' +
+                '            transition: 0.3s;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle a {\n' +
+                '            color: #999;\n' +
+                '            text-decoration: none;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle a:hover {\n' +
+                '            text-decoration: underline;\n' +
+                '            color: #ef8957;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle span.feedback:hover {\n' +
+                '            border-color: #ef8957;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle span:not(.feedback):hover {\n' +
+                '            background: #3ACBDD;\n' +
+                '            color: #fff;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle .feedback {\n' +
+                '            border-color: #aaa;\n' +
+                '        }\n' +
+                '\n' +
+                '        #btnEle>div {\n' +
+                '            width: 100%;\n' +
+                '            margin-bottom: -100%;\n' +
+                '            display: flex;\n' +
+                '            justify-content: space-around;\n' +
+                '            background: #EFF4F8;\n' +
+                '            border-radius: 4px;\n' +
+                '        }\n' +
+                '\n' +
+                '        /*close button*/\n' +
+                '        #noqrlogin-close {\n' +
+                '            background: white;\n' +
+                '            color: #3ABDC1;\n' +
+                '            line-height: 20px;\n' +
+                '            text-align: center;\n' +
+                '            height: 20px;\n' +
+                '            width: 20px;\n' +
+                '            font-size: 20px;\n' +
+                '            padding: 10px;\n' +
+                '            border: 3px solid #3ABDC1;\n' +
+                '            border-radius: 50%;\n' +
+                '            transition: .5s;\n' +
+                '            top: -20px;\n' +
+                '            right: -20px;\n' +
+                '            position: absolute;\n' +
+                '            cursor: pointer;\n' +
+                '        }\n' +
+                '\n' +
+                '        #noqrlogin-close::before {\n' +
+                '            content: \'\\2716\';\n' +
+                '        }\n' +
+                '\n' +
+                '        #noqrlogin-close:hover {\n' +
+                '            background: indianred;\n' +
+                '            border-color: indianred;\n' +
+                '            color: #fff;\n' +
+                '        }';
+            $("<style></style>").text(globalStyle).appendTo($("head"));
+        },
+        bindClick: function (e) {
+            var self = this;
+            var targetClass = e.target.className;
+            var targetid = e.target.id;
+            if (targetid == 'noqrlogin-close') {//关闭按钮
+                self.hide();
+            }
+
+            if (targetid == 'noqrlogin-save') {//保存设置
+                $('section.switch input').each(function (i, o) {
+                    $.each(storageData, function (j, d) {
+                        if (d.name == o.name) d.enabled = $(o.closest('.checkbox')).hasClass('on')
+                    })
+                });
+                //console.log(storageData);
+                setStorageData(storageData);
+                self.hide();
+            }
+
+            if (targetClass == 'switchLabel') {//切换开关
+                var switchEle = $(e.target).closest('.checkbox');
+                if (switchEle.hasClass('on')) {
+                    switchEle.removeClass('on');
+                } else {
+                    switchEle.addClass('on');
+                }
+            }
+        }
+    };
+
+    function startSettings() {
+        var settings = new Settings();
+        settings.show();
+    }
+
+    //startSettings();
 
 
     //处理业务

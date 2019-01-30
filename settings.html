@@ -276,13 +276,18 @@
                 self.addGlobalStyle();
                 self.mask.append(self.ele);
                 $('body').append(self.mask);
-                self.bindClick();
                 self.mask.on('click', function () {
                     self.hide();
                 });
                 self.ele.on('click', function (e) {
+                    self.bindClick(e);
                     e.stopPropagation();
-                })
+                });
+                $(document).keyup(function (e) {
+                    if (e.key === "Escape") { // escape key maps to keycode `27`
+                        self.hide();
+                    }
+                });
             },
             addContent: function () {
                 //各网站开关
@@ -291,7 +296,7 @@
                     var itemDiv = $('<section class="switch"></section>');
                     var checkDiv = $('<div class="checkbox"></div>');
                     if (item.enabled) checkDiv.addClass('on')
-                    itemDiv.append($('<span></span>').text(item.name)).append(checkDiv.append($('<input type="checkbox" />').attr('name', item.name)).append($('<label></label>')));
+                    itemDiv.append($('<span></span>').text(item.name)).append(checkDiv.append($('<input type="checkbox" />').attr('name', item.name)).append($('<label class="switchLabel"></label>')));
                     itemList.append(itemDiv);
                 });
                 //按钮（反馈、保存等）
@@ -539,40 +544,33 @@
                     '        }';
                 $("<style></style>").text(globalStyle).appendTo($("head"));
             },
-            bindClick: function () {
+            bindClick: function (e) {
                 var self = this;
-                //关闭按钮
-                $('#noqrlogin-close').on('click', function () {
+                var targetClass = e.target.className;
+                var targetid = e.target.id;
+                if (targetid == 'noqrlogin-close') {//关闭按钮
                     self.hide();
-                });
-                //Esc Keyup
-                //todo test compatibility
-                $(document).keyup(function (e) {
-                    if (e.key === "Escape") { // escape key maps to keycode `27`
-                        self.hide();
-                    }
-                });
-                //切换开关
-                $('.checkbox').on('click', function () {
-                    var self = $(this);
-                    if (self.hasClass('on')) {
-                        self.removeClass('on');
-                    } else {
-                        self.addClass('on');
-                    }
-                });
-                //保存设置
-                $('#noqrlogin-save').on('click', function () {
-                    $('section.switch input').each(function (i, e) {
-                        $.each(storageData, function (r, d) {
-                            if (d.name == e.name) d.enabled = $(e.closest(
-                                '.checkbox')).hasClass(
-                                'on')
+                }
+
+                if (targetid == 'noqrlogin-save') {//保存设置
+                    $('section.switch input').each(function (i, o) {
+                        $.each(storageData, function (j, d) {
+                            if (d.name == o.name) d.enabled = $(o.closest('.checkbox')).hasClass('on')
                         })
                     });
+
                     console.log(storageData);
                     self.hide();
-                })
+                }
+
+                if (targetClass == 'switchLabel') {//切换开关
+                    var switchEle = $(e.target).closest('.checkbox');
+                    if (switchEle.hasClass('on')) {
+                        switchEle.removeClass('on');
+                    } else {
+                        switchEle.addClass('on');
+                    }
+                }
             }
         };
 
