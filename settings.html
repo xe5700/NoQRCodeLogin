@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Settings</title>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!--<script src="jquery-latest.min.js"></script>-->
+    <!--
+        <style type="text/css">
+            /* 开关按钮 */
+            #itemlist {
+                display: flex;
+                display: -webkit-flex;
+                align-content: center;
+                align-items: center;
+                justify-content: center;
+                flex-flow: row wrap;
+            }
+
+            section {
+                float: left;
+                width: 200px;
+                padding: 6px 20px;
+            }
+
+            .switch span {
+                height: 30px;
+                line-height: 30px;
+                font-size: 20px;
+                vertical-align: top;
+            }
+
+            .switch .checkbox {
+                float: right;
+            }
+
+            .checkbox {
+                position: relative;
+                display: inline-block;
+            }
+
+            .checkbox:after,
+            .checkbox:before {
+                -webkit-font-feature-settings: normal;
+                -moz-font-feature-settings: normal;
+                font-feature-settings: normal;
+                -webkit-font-kerning: auto;
+                font-kerning: auto;
+                -moz-font-language-override: normal;
+                font-language-override: normal;
+                font-stretch: normal;
+                font-style: normal;
+                font-synthesis: weight style;
+                font-variant: normal;
+                font-weight: normal;
+                text-rendering: auto;
+            }
+
+            .checkbox label {
+                width: 80px;
+                height: 30px;
+                background: #ccc;
+                position: relative;
+                display: inline-block;
+                border-radius: 46px;
+                -webkit-transition: 0.4s;
+                transition: 0.4s;
+                cursor: pointer;
+            }
+
+            .checkbox label:after {
+                content: '';
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                border-radius: 100%;
+                left: 0;
+                top: -5px;
+                z-index: 2;
+                background: #fff;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+                -webkit-transition: 0.4s;
+                transition: 0.4s;
+                cursor: pointer;
+            }
+
+            .checkbox input {
+                display: none;
+            }
+
+            .checkbox.on label:after {
+                left: 40px;
+            }
+
+            .checkbox.on label {
+                background: #4BD865;
+            }
+
+            .switch .checkbox label {
+                width: 70px;
+            }
+
+            .switch .checkbox label:after {
+                top: 0;
+                width: 30px;
+                height: 30px;
+            }
+
+            /* 弹出层 */
+            #settingLayerMask {
+                display: none;
+                justify-content: center;
+                align-items: center;
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, .5);
+                z-index: 200000000;
+                overflow: auto;
+                font-family: arial, sans-serif;
+                min-height: 100%;
+                font-size: 16px;
+                transition: 0.5s;
+                opacity: 1;
+                user-select: none;
+                -moz-user-select: none;
+                padding-bottom: 80px;
+                box-sizing: border-box;
+            }
+
+            #settingLayer {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 20px;
+                margin: 0px 25px 50px 5px;
+                background-color: #fff;
+                border-radius: 4px;
+                position: absolute;
+                width: 60%;
+                transition: 0.5s;
+            }
+
+
+            #btnEle {
+                position: absolute;
+                width: 100%;
+                bottom: 4px;
+                right: 0;
+                background: #fff;
+                border-radius: 4px;
+            }
+
+            #btnEle span {
+                display: inline-block;
+                background: #EFF4F8;
+                border: 1px solid #3abdc1;
+                margin: 12px auto 10px;
+                color: #3abdc1;
+                padding: 5px 10px;
+                border-radius: 4px;
+                cursor: pointer;
+                outline: none;
+                transition: 0.3s;
+            }
+
+            #btnEle a {
+                color: #999;
+                text-decoration: none;
+            }
+
+            #btnEle a:hover {
+                text-decoration: underline;
+                color: #ef8957;
+            }
+
+            #btnEle span.feedback:hover {
+                border-color: #ef8957;
+            }
+
+            #btnEle span:not(.feedback):hover {
+                background: #3ACBDD;
+                color: #fff;
+            }
+
+            #btnEle .feedback {
+                border-color: #aaa;
+            }
+
+            #btnEle > div {
+                width: 100%;
+                margin-bottom: -100%;
+                display: flex;
+                justify-content: space-around;
+                background: #EFF4F8;
+                border-radius: 4px;
+            }
+
+            /*close button*/
+            #noqrlogin-close {
+                background: white;
+                color: #3ABDC1;
+                line-height: 20px;
+                text-align: center;
+                height: 20px;
+                width: 20px;
+                font-size: 20px;
+                padding: 10px;
+                border: 3px solid #3ABDC1;
+                border-radius: 50%;
+                transition: .5s;
+                top: -20px;
+                right: -20px;
+                position: absolute;
+                cursor: pointer;
+            }
+
+            #noqrlogin-close::before {
+                content: '\2716';
+            }
+
+            #noqrlogin-close:hover {
+                background: indianred;
+                border-color: indianred;
+                color: #fff;
+            }
+        </style>
+    -->
+</head>
+<body>
+<div id="wrapper_wrapper" style="display: block;">
+    <div id="container" class="container_l">
+        <a class="start">开启</a>
+    </div>
+</div>
+<script>
+    $(function () {
+        var storageData = [
+            {'name': '12306', 'url': 'kyfw.12306.cn', 'enabled': true},
+            {'name': '淘宝', 'url': 'login.taobao.com', 'enabled': true},
+            {'name': '京东', 'url': 'passport.jd.com', 'enabled': true},
+            {'name': '百度', 'url': 'baidu.com', 'enabled': true},
+            {'name': '豆瓣', 'url': 'douban.com', 'enabled': true},
+            {'name': '苏宁易购', 'url': 'passport.suning.com', 'enabled': true},
+            {'name': '知乎', 'url': 'zhihu.com', 'enabled': true},
+            {'name': '支付宝', 'url': 'alipay.com', 'enabled': true},
+            {
+                'name': '腾讯QQ',
+                'url': ['xui.ptlogin2.qq.com', 'ssl.xui.ptlogin2.qq.com', 'ui.ptlogin2.qq.com'],
+                'enabled': true
+            },
+            {'name': '微云', 'url': 'weiyun.com', 'enabled': true},
+            {'name': '腾讯云', 'url': ['cloud.tencent.com', 'qcloud.com'], 'enabled': true},
+            {'name': '腾讯企业邮箱', 'url': 'exmail.qq.com', 'enabled': true},
+            {'name': '虾米音乐', 'url': 'xiami.com', 'enabled': true},
+            {'name': '虎牙直播', 'url': 'huya.com', 'enabled': true},
+            {'name': '58同城', 'url': 'passport.58.com', 'enabled': true},
+            {'name': '百姓网', 'url': 'baixing.com', 'enabled': true},
+            {'name': '升蓝物流', 'url': 'sl56.com', 'enabled': true}
+        ];
+
+        function Settings() {
+            this.mask = $('<div></div>');
+            this.ele = $('<div></div>');
+            this.init();
+        }
+
+        Settings.prototype = {
+            init: function () {
+                var self = this;
+                self.mask.attr('id', 'settingLayerMask');
+                self.ele.attr('id', 'settingLayer');
+                self.addContent();
+                self.addGlobalStyle();
+                self.mask.append(self.ele);
+                $('body').append(self.mask);
+                self.mask.on('click', function () {
+                    self.hide();
+                });
+                self.ele.on('click', function (e) {
+                    self.bindClick(e);
+                    e.stopPropagation();
+                });
+                $(document).keyup(function (e) {
+                    if (e.key === "Escape") { // escape key maps to keycode `27`
+                        self.hide();
+                    }
+                });
+            },
+            addContent: function () {
+                //各网站开关
+                var itemList = $('<div id="itemlist"></div>');
+                $.each(storageData, function (i, item) {
+                    var itemDiv = $('<section class="switch"></section>');
+                    var checkDiv = $('<div class="checkbox"></div>');
+                    if (item.enabled) checkDiv.addClass('on')
+                    itemDiv.append($('<span></span>').text(item.name)).append(checkDiv.append($('<input type="checkbox" />').attr('name', item.name)).append($('<label class="switchLabel"></label>')));
+                    itemList.append(itemDiv);
+                });
+                //按钮（反馈、保存等）
+                var btnEle = $('<div id="btnEle"></div>');
+                //Greasyfork反馈按钮
+                var feedbackGreasyforkEle = $('<span class="feedback"></span>').append($('<a target="_blank" href="https://greasyfork.org/zh-CN/scripts/37988-%E6%8B%92%E7%BB%9D%E4%BA%8C%E7%BB%B4%E7%A0%81%E7%99%BB%E5%BD%95">反馈greasyfork</a>'));
+                //GitHub反馈按钮
+                var feedbackGitHubEle = $('<span class="feedback"></span>').append($('<a target="_blank" href="https://github.com/mmxxooyy/NoQRCodeLogin">反馈 GitHub</a>'));
+                //保存按钮
+                var saveEle = $('<span id="noqrlogin-save" title="save &amp; close">保存并关闭</span>');
+                //关闭按钮
+                var closeEle = $('<span id="noqrlogin-close" title="close 关闭"></span>');
+                this.ele.append(itemList).append(btnEle.append($('<div class="btnEleLayer"></div>').append(feedbackGreasyforkEle).append(feedbackGitHubEle).append(saveEle))).append(closeEle);
+            },
+            show: function () {
+                var self = this;
+                setTimeout(function () {
+                    self.mask.css('display', 'flex');
+                }, 30);
+            },
+            hide: function () {
+                var self = this;
+                setTimeout(function () {
+                    self.mask.css('display', 'none');
+                }, 100);
+            },
+            addGlobalStyle: function () {
+                var globalStyle = ' /* 开关按钮 */\n' +
+                    '        #itemlist {\n' +
+                    '            display: flex;\n' +
+                    '            display: -webkit-flex;\n' +
+                    '            align-content: center;\n' +
+                    '            align-items: center;\n' +
+                    '            justify-content: center;\n' +
+                    '            flex-flow: row wrap;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        section {\n' +
+                    '            float: left;\n' +
+                    '            width: 200px;\n' +
+                    '            padding: 6px 20px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .switch span {\n' +
+                    '            height: 30px;\n' +
+                    '            line-height: 30px;\n' +
+                    '            font-size: 20px;\n' +
+                    '            vertical-align: top;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .switch .checkbox {\n' +
+                    '            float: right;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox {\n' +
+                    '            position: relative;\n' +
+                    '            display: inline-block;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox:after,\n' +
+                    '        .checkbox:before {\n' +
+                    '            -webkit-font-feature-settings: normal;\n' +
+                    '            -moz-font-feature-settings: normal;\n' +
+                    '            font-feature-settings: normal;\n' +
+                    '            -webkit-font-kerning: auto;\n' +
+                    '            font-kerning: auto;\n' +
+                    '            -moz-font-language-override: normal;\n' +
+                    '            font-language-override: normal;\n' +
+                    '            font-stretch: normal;\n' +
+                    '            font-style: normal;\n' +
+                    '            font-synthesis: weight style;\n' +
+                    '            font-variant: normal;\n' +
+                    '            font-weight: normal;\n' +
+                    '            text-rendering: auto;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox label {\n' +
+                    '            width: 80px;\n' +
+                    '            height: 30px;\n' +
+                    '            background: #ccc;\n' +
+                    '            position: relative;\n' +
+                    '            display: inline-block;\n' +
+                    '            border-radius: 46px;\n' +
+                    '            -webkit-transition: 0.4s;\n' +
+                    '            transition: 0.4s;\n' +
+                    '            cursor: pointer;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox label:after {\n' +
+                    '            content: \'\';\n' +
+                    '            position: absolute;\n' +
+                    '            width: 50px;\n' +
+                    '            height: 50px;\n' +
+                    '            border-radius: 100%;\n' +
+                    '            left: 0;\n' +
+                    '            top: -5px;\n' +
+                    '            z-index: 2;\n' +
+                    '            background: #fff;\n' +
+                    '            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);\n' +
+                    '            -webkit-transition: 0.4s;\n' +
+                    '            transition: 0.4s;\n' +
+                    '            cursor: pointer;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox input {\n' +
+                    '            display: none;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox.on label:after {\n' +
+                    '            left: 40px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .checkbox.on label {\n' +
+                    '            background: #4BD865;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .switch .checkbox label {\n' +
+                    '            width: 70px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        .switch .checkbox label:after {\n' +
+                    '            top: 0;\n' +
+                    '            width: 30px;\n' +
+                    '            height: 30px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        /* 弹出层 */\n' +
+                    '        #settingLayerMask {\n' +
+                    '            display: none;\n' +
+                    '            justify-content: center;\n' +
+                    '            align-items: center;\n' +
+                    '            position: fixed;\n' +
+                    '            top: 0;\n' +
+                    '            right: 0;\n' +
+                    '            bottom: 0;\n' +
+                    '            left: 0;\n' +
+                    '            background-color: rgba(0, 0, 0, .5);\n' +
+                    '            z-index: 200000000;\n' +
+                    '            overflow: auto;\n' +
+                    '            font-family: arial, sans-serif;\n' +
+                    '            min-height: 100%;\n' +
+                    '            font-size: 16px;\n' +
+                    '            transition: 0.5s;\n' +
+                    '            opacity: 1;\n' +
+                    '            user-select: none;\n' +
+                    '            -moz-user-select: none;\n' +
+                    '            padding-bottom: 80px;\n' +
+                    '            box-sizing: border-box;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #settingLayer {\n' +
+                    '            display: flex;\n' +
+                    '            flex-wrap: wrap;\n' +
+                    '            padding: 20px;\n' +
+                    '            margin: 0px 25px 50px 5px;\n' +
+                    '            background-color: #fff;\n' +
+                    '            border-radius: 4px;\n' +
+                    '            position: absolute;\n' +
+                    '            width: 60%;\n' +
+                    '            transition: 0.5s;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '\n' +
+                    '        #btnEle {\n' +
+                    '            position: absolute;\n' +
+                    '            width: 100%;\n' +
+                    '            bottom: 4px;\n' +
+                    '            right: 0;\n' +
+                    '            background: #fff;\n' +
+                    '            border-radius: 4px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle span {\n' +
+                    '            display: inline-block;\n' +
+                    '            background: #EFF4F8;\n' +
+                    '            border: 1px solid #3abdc1;\n' +
+                    '            margin: 12px auto 10px;\n' +
+                    '            color: #3abdc1;\n' +
+                    '            padding: 5px 10px;\n' +
+                    '            border-radius: 4px;\n' +
+                    '            cursor: pointer;\n' +
+                    '            outline: none;\n' +
+                    '            transition: 0.3s;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle a {\n' +
+                    '            color: #999;\n' +
+                    '            text-decoration: none;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle a:hover {\n' +
+                    '            text-decoration: underline;\n' +
+                    '            color: #ef8957;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle span.feedback:hover {\n' +
+                    '            border-color: #ef8957;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle span:not(.feedback):hover {\n' +
+                    '            background: #3ACBDD;\n' +
+                    '            color: #fff;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle .feedback {\n' +
+                    '            border-color: #aaa;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #btnEle>div {\n' +
+                    '            width: 100%;\n' +
+                    '            margin-bottom: -100%;\n' +
+                    '            display: flex;\n' +
+                    '            justify-content: space-around;\n' +
+                    '            background: #EFF4F8;\n' +
+                    '            border-radius: 4px;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        /*close button*/\n' +
+                    '        #noqrlogin-close {\n' +
+                    '            background: white;\n' +
+                    '            color: #3ABDC1;\n' +
+                    '            line-height: 20px;\n' +
+                    '            text-align: center;\n' +
+                    '            height: 20px;\n' +
+                    '            width: 20px;\n' +
+                    '            font-size: 20px;\n' +
+                    '            padding: 10px;\n' +
+                    '            border: 3px solid #3ABDC1;\n' +
+                    '            border-radius: 50%;\n' +
+                    '            transition: .5s;\n' +
+                    '            top: -20px;\n' +
+                    '            right: -20px;\n' +
+                    '            position: absolute;\n' +
+                    '            cursor: pointer;\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #noqrlogin-close::before {\n' +
+                    '            content: \'\\2716\';\n' +
+                    '        }\n' +
+                    '\n' +
+                    '        #noqrlogin-close:hover {\n' +
+                    '            background: indianred;\n' +
+                    '            border-color: indianred;\n' +
+                    '            color: #fff;\n' +
+                    '        }';
+                $("<style></style>").text(globalStyle).appendTo($("head"));
+            },
+            bindClick: function (e) {
+                var self = this;
+                var targetClass = e.target.className;
+                var targetid = e.target.id;
+                if (targetid == 'noqrlogin-close') {//关闭按钮
+                    self.hide();
+                }
+
+                if (targetid == 'noqrlogin-save') {//保存设置
+                    $('section.switch input').each(function (i, o) {
+                        $.each(storageData, function (j, d) {
+                            if (d.name == o.name) d.enabled = $(o.closest('.checkbox')).hasClass('on')
+                        })
+                    });
+
+                    console.log(storageData);
+                    self.hide();
+                }
+
+                if (targetClass == 'switchLabel') {//切换开关
+                    var switchEle = $(e.target).closest('.checkbox');
+                    if (switchEle.hasClass('on')) {
+                        switchEle.removeClass('on');
+                    } else {
+                        switchEle.addClass('on');
+                    }
+                }
+            }
+        };
+
+        var settings = new Settings();
+        $('.start').on('click', function () {
+            settings.show();
+        }).trigger('click');
+    })
+</script>
+</body>
+
+</html>
