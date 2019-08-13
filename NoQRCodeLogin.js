@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         拒绝二维码登录
 // @namespace    NoQRCodeLogin
-// @version      2.0.0
-// @description  新版12306、QQ、支付宝、淘宝、京东、百度云盘等网站默认使用账号密码登录，不出现二维码登录界面，原版出自https://greasyfork.org/zh-CN/scripts/27183，采用jQuery重写,有需求或问题请反馈。
+// @version      2.0.5
+// @description  新版12306、QQ、支付宝、淘宝、京东、百度云盘等网站默认使用账号密码登录，不出现二维码登录界面,可自定义设置在指定网站开启和关闭，有需求或问题请反馈。
 // @author       Eva
 // @match        *://kyfw.12306.cn/*
 // @match        *://login.taobao.com/*
@@ -17,9 +17,14 @@
 // @match        *://exmail.qq.com/*
 // @match        *://*.cloud.tencent.com/*
 // @match        *://*.qcloud.com/*
+// @match        *://mail.163.com/*
+// @match        *://mail.126.com/*
+// @match        *://www.iqiyi.com/*
 // @match        *://*.xiami.com/*
 // @match        *://*.huya.com/*
 // @match        *://passport.58.com/*
+// @match        *://*.115.com/*
+// @match        *://*.tianya.cn/*
 // @match        *://*.baixing.com/*
 // @match        *://*.sl56.com/*
 // @grant        unsafeWindow
@@ -51,12 +56,20 @@
             'url': ['xui.ptlogin2.qq.com', 'ssl.xui.ptlogin2.qq.com', 'ui.ptlogin2.qq.com'],
             'enabled': true
         },
+        {
+            'name': '网易邮箱',
+            'url': ['mail.163.com', 'mail.126.com'],
+            'enabled': true
+        },
         {'name': '微云', 'url': 'weiyun.com', 'enabled': true},
         {'name': '腾讯云', 'url': ['cloud.tencent.com', 'qcloud.com'], 'enabled': true},
         {'name': '腾讯企业邮箱', 'url': 'exmail.qq.com', 'enabled': true},
+        {'name': '爱奇艺', 'url': 'iqiyi.com', 'enabled': true},
         {'name': '虾米音乐', 'url': 'xiami.com', 'enabled': true},
         {'name': '虎牙直播', 'url': 'huya.com', 'enabled': true},
         {'name': '58同城', 'url': 'passport.58.com', 'enabled': true},
+        {'name': '115云', 'url': '115.com', 'enabled': true},
+        {'name': '天涯社区', 'url': 'tianya.cn', 'enabled': true},
         {'name': '百姓网', 'url': 'baixing.com', 'enabled': true},
         {'name': '升蓝物流', 'url': 'sl56.com', 'enabled': true}
     ];
@@ -462,39 +475,14 @@
                 }, 50);
                 break;
             case 'baidu.com':  //百度
-                //todo optimize code
-                var auto = setInterval(function () {
-                    var yunbtn = $('#TANGRAM__PSP_4__footerULoginBtn');
-                    var indexBtn = $('#TANGRAM__PSP_10__footerULoginBtn');
-                    var passportBtn = $('#TANGRAM__PSP_3__footerULoginBtn');
-                    var tiebaBtn = $('#TANGRAM__PSP_11__footerULoginBtn');
-                    var tiebaBtn2 = $('#TANGRAM__PSP_28__footerULoginBtn');
-                    var wenKuBtn = $('#TANGRAM__PSP_18__footerULoginBtn');
-                    if (yunbtn.length > 0) {
-                        yunbtn[0].click();
-                        clearInterval(auto);
+                $('body').bind('DOMNodeInserted', function (e) {
+                    var e_chilren = $(e.target).find('[id^=TANGRAM__PSP_][id$=__footerULoginBtn]');
+                    if (e_chilren.length > 0) {
+                        setTimeout(function () {
+                            e_chilren.trigger("click");
+                        }, 100);
                     }
-                    if (indexBtn.length > 0) {
-                        indexBtn[0].click();
-                        clearInterval(auto);
-                    }
-                    if (passportBtn.length > 0) {
-                        passportBtn[0].click();
-                        clearInterval(auto);
-                    }
-                    if (tiebaBtn.length > 0) {
-                        tiebaBtn[0].click();
-                        clearInterval(auto);
-                    }
-                    if (tiebaBtn2.length > 0) {
-                        tiebaBtn2[0].click();
-                        clearInterval(auto);
-                    }
-                    if (wenKuBtn.length > 0) {
-                        wenKuBtn[0].click();
-                        clearInterval(auto);
-                    }
-                }, 50);
+                });
                 break;
             case 'douban.com':  //豆瓣
                 var auto = setInterval(function () {
@@ -604,6 +592,28 @@
                     }
                 }, 50);
                 break;
+            case 'mail.163.com':  //网易163邮箱
+            case 'mail.126.com':  //网易126邮箱
+                var auto = setInterval(function () {
+                    if ($('#normalLoginTab').css('display') === 'none') {
+                        $('#lbNormal')[0].click();
+                        clearInterval(auto);
+                    }
+                }, 50);
+                break;
+            case 'iqiyi.com':  //爱奇艺
+                $('body').bind('DOMNodeInserted', function (e) {
+                    if ($(e.target).hasClass('login-frame-bottom')) {
+                        var auto = setInterval(function () {
+                            var loginFrame = $('.login-frame[data-loginele="codeLogin"]');
+                            if (!loginFrame.hasClass('dn')) {
+                                loginFrame.find('a[rseat="cmm_lgn"]')[0].click();
+                                clearInterval(auto);
+                            }
+                        }, 50);
+                    }
+                });
+                break;
             case 'xiami.com':  //虾米音乐
                 $('.modal-wrapper').bind('DOMNodeInserted', function (e) {
                     var auto = setInterval(function () {
@@ -631,6 +641,32 @@
                         clearInterval(auto);
                     }
                 }, 50);
+                break;
+            case '115.com':  //115云
+                var auto = setInterval(function () {
+                    if ($('.login-scene[lg_rel="login"]').css('display') === 'none') {
+                        $('.login-scene').css('display',"none");
+                        $('.login-scene[lg_rel="login"]').css('display',"block");
+                        $('#js-account-box .login-popup-hint').css('display',"block");
+                        clearInterval(auto);
+                    }
+                }, 50);
+                break;
+            case 'tianya.cn':  //天涯社区
+                var process = function () {
+                    var auto = setInterval(function () {
+                        if ($('#loginWin_content_wrapper').hasClass('loginWin-qrcode-login-wrapper')) {
+                            $('.loginWin-tab .normal-login-tab')[0].click();
+                            clearInterval(auto);
+                        }
+                    }, 50);
+                }
+                if ($('#loginWin_content_wrapper').length == 1) {
+                    process();
+                }
+                $('#js_login').on('click', function () {
+                    process();
+                })
                 break;
             case 'baixing.com':  //百姓网
                 var auto = setInterval(function () {
