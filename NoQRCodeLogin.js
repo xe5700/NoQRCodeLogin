@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         拒绝二维码登录
 // @namespace    NoQRCodeLogin
-// @version      2.1.3
+// @version      2.1.8
 // @description  新版12306、QQ、支付宝、淘宝、京东、百度云盘等网站默认使用账号密码登录，不出现二维码登录界面,可自定义设置在指定网站开启和关闭，有需求或问题请反馈。
 // @author       Eva
 // @match        *://kyfw.12306.cn/*
@@ -25,10 +25,12 @@
 // @match        *://www.acfun.cn/*
 // @match        *://*.xiami.com/*
 // @match        *://*.huya.com/*
+// @match        *://*.smzdm.com/*
 // @match        *://passport.58.com/*
 // @match        *://passport.csdn.net/*
 // @match        *://*.115.com/*
 // @match        *://*.tianya.cn/*
+// @match        *://*.dnspod.cn/*
 // @match        *://*.tyrz.gd.gov.cn/*
 // @match        *://*.baixing.com/*
 // @match        *://*.sl56.com/*
@@ -37,7 +39,7 @@
 // @grant        GM_setValue
 // @grant        GM.deleteValue
 // @grant        GM_registerMenuCommand
-// @require      https://code.jquery.com/jquery-latest.min.js
+// @require      https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.min.js
 // @run-at 		 document-end
 // ==/UserScript==
 
@@ -75,10 +77,12 @@
         {'name': 'AcFun', 'url': 'www.acfun.cn', 'enabled': true},
         {'name': '虾米音乐', 'url': 'xiami.com', 'enabled': true},
         {'name': '虎牙直播', 'url': 'huya.com', 'enabled': true},
+        {'name': '什么值得买', 'url': 'smzdm.com', 'enabled': true},
         {'name': '58同城', 'url': 'passport.58.com', 'enabled': true},
         {'name': 'CSDN', 'url': 'passport.csdn.net', 'enabled': true},
         {'name': '115云', 'url': '115.com', 'enabled': true},
         {'name': '天涯社区', 'url': 'tianya.cn', 'enabled': true},
+        {'name': 'DNSPod', 'url': 'dnspod.cn', 'enabled': true},
         {'name': '广东省统一身份认证平台', 'url': 'tyrz.gd.gov.cn', 'enabled': true},
         {'name': '百姓网', 'url': 'baixing.com', 'enabled': true},
         {'name': '升蓝物流', 'url': 'sl56.com', 'enabled': true}
@@ -511,13 +515,16 @@
                 }, 50);
                 break;
             case 'zhihu.com':  //知乎
-                var loginDiv = $('.Login-content');
-                var auto = setInterval(function () {
-                    if (loginDiv.length == 0) {
-                        $('.SignContainer-switch').children("span").click();
-                        clearInterval(auto);
+                $('body').bind('DOMNodeInserted', function (e) {
+                    if ($(e.target).find('.Login-content').length > 0) {
+                        var auto = setInterval(function () {
+                            if ($('.SignFlow-tabs .SignFlow-tab').length > 1 && !$('.SignFlow-tabs .SignFlow-tab').filter(function() {return $(this).text() == "密码登录";}).hasClass('SignFlow-tab--active')) {
+                                $('.SignFlow-tabs .SignFlow-tab').filter(function() {return $(this).text() == "密码登录";})[0].click();
+                                clearInterval(auto);
+                            }
+                        }, 50);
                     }
-                }, 50);
+                });
                 break;
             case 'alipay.com':  //支付宝
                 var auto = setInterval(function () {
@@ -604,12 +611,20 @@
                 break;
             case 'cloud.tencent.com':  //腾讯云
             case 'qcloud.com':
-                var auto = setInterval(function () {
-                    if ($('.J-wxloginBox').css('display') === 'block') {
-                        $('a[data-type="email"]')[0].click();
-                        clearInterval(auto);
+                var timer = function(){
+                    var auto = setInterval(function () {
+                        if ($('.J-qcloginBox').css('display') === 'none') {
+                            $('.J-btnSwitchLoginType[data-type="email"]')[0].click();
+                            clearInterval(auto);
+                        }
+                    }, 50);
+                }
+                timer();
+                $('body').bind('DOMNodeInserted', function (e) {
+                    if ($(e.target).hasClass('J-commonLoginContent')) {
+                        timer();
                     }
-                }, 50);
+                });
                 break;
 
             case 'exmail.qq.com':  //腾讯企业邮箱
@@ -686,6 +701,14 @@
                     }
                 }, 50);
                 break;
+            case 'smzdm.com':  //什么值得买
+                var auto = setInterval(function () {
+                    if ($('.login').css('display') === 'none') {
+                        $('.qrcode-change')[0].click();
+                        clearInterval(auto);
+                    }
+                }, 50);
+                break;
             case 'passport.csdn.net':  //CSDN
                 var auto = setInterval(function () {
                     if ($('.main-code').length > 0) {
@@ -722,6 +745,14 @@
                 $('#js_login').on('click', function () {
                     process();
                 })
+                break;
+            case 'dnspod.cn':  //DNSPod
+                var auto = setInterval(function () {
+                    if ($('a[href^="/login/email"]').length >0 && !$('a[href^="/login/email"]').parent('.dp-login__tabitem').hasClass('is-active')) {
+                        $('a[href^="/login/email"]')[0].click();
+                        clearInterval(auto);
+                    }
+                }, 50);
                 break;
             case 'tyrz.gd.gov.cn'://广东省统一身份认证平台
                 var auto = setInterval(function () {
